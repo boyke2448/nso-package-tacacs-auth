@@ -38,6 +38,20 @@ logging.config.fileConfig(
 )
 logger = logging.getLogger(__name__)
 
+# decrypt tacacs secret
+def _decrypt_secret(maapi_interface, secret):
+    """Decrypt tacacs secret using the NSO service
+    
+        Parameters:
+            maapi_interface: An instance of ncs.maapi.Maapi
+            secret: Tacacs Secret
+        
+        Returns:
+            Decrypted password
+    
+    """
+    maapi_interface.install_crypto_keys()
+    return ncs._ncs.decrypt(secret)
 
 def lookup_tacacs_auth_details():
     """Retrieve the tacacs host and secret stored within NSO"""
@@ -61,7 +75,8 @@ def lookup_tacacs_auth_details():
         print(error_message)
         exit(1)
 
-    return (hosts, secret)
+    decrypted_secret = _decrypt_secret(m, secret)
+    return (hosts, decrypted_secret)
 
 
 def process_tacacs_error(error):
