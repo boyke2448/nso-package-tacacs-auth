@@ -36,11 +36,13 @@ module tacacs-auth {
         ordered-by user;
     }
 
-    // TODO : Change this to an encrypted secret. Will need to update the Python code to decrypt.
+    // The secret should be encrypted. AES is currently 2023-10-16 the most populare symetric encryption algorithm supported by NSO
     leaf secret { 
         tailf:info "The TACACS shared-secret to use when communicating with hosts";
-        type string;
+        // type string; // Plain text, don't do it man!
+        // tailf:des3-cbc-encrypted-string; // You could do this, but why.
+        // tailf:aes-cfb-128-encrypted-string; // Better
+        tailf:aes-256-cfb-128-encrypted-string; // this is even better.
     }
-
   }
 }
